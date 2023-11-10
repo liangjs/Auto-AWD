@@ -7,6 +7,7 @@
 from typing import Callable, Tuple
 
 from core.data import Status, Payload
+from typing import *
 
 
 class Item(object):
@@ -28,11 +29,11 @@ class Item(object):
 
 
 class FuncItem(Item):
-    def __init__(self, func: Callable[[str], str]):
+    def __init__(self, func: Callable[[str], Tuple[bool, str]]):
         super(FuncItem, self).__init__()
         self.func = func
 
-    def run(self, ip) -> (bool, str):
+    def run(self, ip) -> Tuple[bool, str]:
         return self.func(ip)
 
 
@@ -46,7 +47,7 @@ class ItemStream(Item):
     flag: FlagItem
     func: FuncItem
 
-    def __init__(self, r: int, ip='127.0.0.1', payload: Payload = None, challenge: str = None):
+    def __init__(self, r: int, ip='127.0.0.1', payload: Optional[Payload] = None, challenge: Optional[str] = None):
         super(ItemStream, self).__init__()
         self.round = r
         self.ip = ip
@@ -60,7 +61,7 @@ class ItemStream(Item):
     def set_flag(self, value):
         self.flag = FlagItem(value)
 
-    def set_func(self, func: Callable[[str], str]):
+    def set_func(self, func: Callable[[str], Tuple[bool, str]]):
         self.func = FuncItem(func)
 
     def has_flag(self):

@@ -14,6 +14,8 @@ from core.service import BaseService
 from core.config import AttackParser
 from core.data import Payload
 
+from typing import *
+
 
 class PayloadMonitor(BaseService, Observer):
     serviceName = 'PayloadFileMonitor'
@@ -21,7 +23,7 @@ class PayloadMonitor(BaseService, Observer):
     payloadDict = {}
 
     @classmethod
-    def load_payload(cls, path) -> Payload:
+    def load_payload(cls, path) -> Optional[Payload]:
         try:
             pd = Payload.load(path)
         except AttributeError as e:
@@ -32,7 +34,7 @@ class PayloadMonitor(BaseService, Observer):
             PayloadMonitor.payloadDict.update({pd.name: pd})
             PayloadMonitor.payloadQueue.put(pd)
             return pd
-        return
+        return None
 
     @property
     def status(self):
@@ -74,11 +76,11 @@ class PayloadMonitor(BaseService, Observer):
         self.schedule(PayloadMonitor.PayloadEventHandler(), self.dir, True)
 
     @classmethod
-    def get(cls, block=True) -> Payload:
+    def get(cls, block=True) -> Optional[Payload]:
         try:
             return cls.payloadQueue.get(block, timeout=3)
         except queue.Empty:
-            return
+            return None
 
     @classmethod
     def clear(cls):

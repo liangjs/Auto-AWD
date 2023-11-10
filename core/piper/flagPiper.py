@@ -13,6 +13,8 @@ from core.item import ItemStream
 from core.piper.basePiper import Piper
 from core.config import PlatformParser
 
+from typing import *
+
 
 class FlagPiper(Piper):
     name = 'flagPiper'
@@ -21,7 +23,7 @@ class FlagPiper(Piper):
         self._config = config
 
     # TODO: retry when timeout/50x
-    def submit_flag(self, flag) -> (bool, str):
+    def submit_flag(self, flag) -> Tuple[bool, str]:
         if self._config.isCurl:
             r, msg = self._parse_shell_output(self._config.curl.format(flag=flag))
         else:
@@ -36,7 +38,7 @@ class FlagPiper(Piper):
                 return True, msg
         return False, msg
 
-    def _parse_shell_output(self, cmd: str) -> (bool, str):
+    def _parse_shell_output(self, cmd: str) -> Tuple[bool, str]:
         with subprocess.Popen(cmd.split(' '), stdout=subprocess.PIPE, stderr=subprocess.PIPE) as p:
             try:
                 exitcode = p.wait(self._config.timeout)
@@ -49,7 +51,7 @@ class FlagPiper(Piper):
                     return False, stderr.decode('utf-8')
                 return True, stdout.decode('utf-8')
 
-    def _parse_request_output(self, flag) -> (bool, str):
+    def _parse_request_output(self, flag) -> Tuple[bool, str]:
         try:
             rep: requests.Response = self._config.py(flag)
         except:
